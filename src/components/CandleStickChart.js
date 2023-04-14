@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Utils from "../Utils/common";
-import ApexCharts from 'apexcharts';
+import Chart from "react-apexcharts";
 
 function CandleStickChart() {
   const chartRef = useRef(null);
-  const initialChartData = {
+  const initialOptions = {
     chart: {
       type: 'candlestick',
       height: 350
@@ -12,9 +12,6 @@ function CandleStickChart() {
     title: {
       text: 'Candlestick Chart Demo'
     },
-    series: [{
-      data: [],
-    }],
     xaxis: {
       type: 'datetime'
     },
@@ -22,10 +19,34 @@ function CandleStickChart() {
       tooltip: {
         enabled: true
       }
+    },
+  };
+  
+  const initialChartData = {
+    series: [{
+      data: [],
+    }],
+    options: {
+      chart: {
+        type: 'candlestick',
+        height: 350
+      },
+      title: {
+        text: 'Candlestick Chart Demo'
+      },
+      xaxis: {
+        type: 'datetime'
+      },
+      yaxis: {
+        tooltip: {
+          enabled: true
+        }
+      },
     }
   }
 
-  const [chartOptions, setChartOptions] = useState(initialChartData);
+  const [chartOptions, setChartOptions] = useState(initialOptions);
+  const [chartSeries, setChartSeries] = useState([{data: []}]);
   
   useEffect(() => {
     getCandleStickData();
@@ -56,24 +77,16 @@ function CandleStickChart() {
         y: [item[1], item[2], item[3], item[4]]
       });
     }
-    const cloneChartOptions = Utils.cloneDeep(chartOptions);
-    cloneChartOptions.series = [{data: newSeriesData}];
-    setChartOptions(cloneChartOptions);
+    setChartSeries([{data: newSeriesData}]);
   }
 
-  useEffect(() => {
-    if (Object.keys(chartOptions).length !== 0) {
-      const chart = new ApexCharts(chartRef.current, chartOptions);
-      chart.render();
-
-      return () => {
-        chart.destroy();
-      };
-    }
-  }, [chartOptions]);
-
   return (
-    <div ref={chartRef}></div>
+    <Chart
+      options={chartOptions}
+      series={chartSeries}
+      type='candlestick'
+      height='350'
+    />
   );
 }
 
